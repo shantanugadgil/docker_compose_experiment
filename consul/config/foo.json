@@ -1,0 +1,19 @@
+{
+  "service": {
+    "id": "foo",
+    "name": "foo",
+    "tags": [
+      "primary"
+    ],
+    "enable_tag_override": true,
+    "checks": [
+      {
+        "id": "foocheck1",
+        "name": "check1 for foo",
+        "tcp": "foo:80",
+        "interval": "60s",
+        "timeout": "2s"
+      }
+    ]
+  }
+}

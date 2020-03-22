@@ -1,0 +1,80 @@
+version: "3.5"
+services:
+  fabio:
+    image: fabiolb/fabio
+    hostname: fabio
+    container_name: fabio
+    volumes:
+      - ./fabio/fabio.properties:/etc/fabio/fabio.properties:ro
+    #network_mode: host
+    ports:
+      - "9998:9998"
+      - "9999:9999"
+    networks:
+      - demo-net
+    labels:
+      "SERVICE_IGNORE": "true"
+  registrator:
+    image: gliderlabs/registrator:latest
+    hostname: registrator
+    container_name: registrator
+    networks:
+      - demo-net
+    depends_on:
+      - consul
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock 
+    entrypoint: /bin/registrator -internal -cleanup -deregister="on-success" consul://consul:8500
+    labels:
+      "SERVICE_IGNORE": "true"
+  consul:
+    image: consul
+    hostname: consul
+    container_name: consul
+    #network_mode: host
+    ports:
+      - "18400:8400"
+      - "18500:8500"
+      - "18600:8600"
+      - "18600:8600/udp"
+    networks:
+      - demo-net
+    command: "agent -dev -ui -data-dir /consul/data -config-dir=/consul/config -log-level INFO -client 0.0.0.0"
+    volumes:
+        - ./consul/config:/consul/config
+    labels:
+      "SERVICE_IGNORE": "true"
+  foo:
+    image: nginx
+    hostname: foo
+    container_name: foo
+    volumes:
+      - ./foo/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "80"
+    labels:
+      "SERVICE_NAME": "foo"
+      "SERVICE_TAGS": "urlprefix-/foo"
+      "SERVICE_CHECK_HTTP": "/"
+      "SERVICE_CHECK_INTERVAL": "30s"
+    networks:
+      - demo-net
+  bar:
+    image: nginx
+    hostname: bar
+    container_name: bar
+    volumes:
+      - ./bar/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "80"
+    labels:
+      "SERVICE_NAME": "bar"
+      "SERVICE_TAGS": "urlprefix-/bar"
+      "SERVICE_CHECK_HTTP": "/"
+      "SERVICE_CHECK_INTERVAL": "30s"
+    networks:
+      - demo-net
+
+networks:
+  demo-net:
+    name: demo-net

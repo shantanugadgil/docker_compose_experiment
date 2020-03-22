@@ -1,0 +1,19 @@
+{
+  "service": {
+    "id": "bar",
+    "name": "bar",
+    "tags": [
+      "secondary"
+    ],
+    "enable_tag_override": true,
+    "checks": [
+      {
+        "id": "barcheck1",
+        "name": "check1 for bar",
+        "tcp": "bar:80",
+        "interval": "60s",
+        "timeout": "2s"
+      }
+    ]
+  }
+}
